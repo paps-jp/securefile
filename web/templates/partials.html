@@ -1,0 +1,87 @@
+{{define "head"}}<!doctype html>
+<html lang="{{.Lang}}" dir="{{.Dir}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}}</title>
+<meta name="description" content="{{.Description}}">
+{{if .NoIndex}}<meta name="robots" content="noindex, nofollow">{{else}}<meta name="robots" content="index, follow, max-image-preview:large">{{end}}
+{{if .Canonical}}<link rel="canonical" href="{{.Canonical}}">{{end}}
+{{if not .NoIndex}}{{range .LangLinks}}<link rel="alternate" hreflang="{{.Code}}" href="{{.Abs}}">
+{{end}}<link rel="alternate" hreflang="x-default" href="{{(index .LangLinks 0).Abs}}">
+{{end}}<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{.T "brand.name"}}">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:description" content="{{.Description}}">
+{{if .Canonical}}<meta property="og:url" content="{{.Canonical}}">{{end}}
+<meta property="og:image" content="{{.OGImage}}">
+<meta property="og:locale" content="{{.Lang}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{.Title}}">
+<meta name="twitter:description" content="{{.Description}}">
+<meta name="twitter:image" content="{{.OGImage}}">
+<link rel="stylesheet" href="/static/app.css?v={{.AssetV}}">
+<link rel="icon" href="/static/icon.svg?v={{.AssetV}}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png?v={{.AssetV}}">
+<link rel="manifest" href="{{.URL "/manifest.webmanifest"}}">
+<meta name="theme-color" content="#0e9594">
+{{if .GAID}}<script async src="https://www.googletagmanager.com/gtag/js?id={{.GAID}}"></script>
+<script src="/static/ga.js?v={{.AssetV}}" data-ga-id="{{.GAID}}" defer></script>
+{{end}}{{if .StructuredData}}{{.StructuredData}}
+{{end}}</head>
+<body>
+{{end}}
+
+{{define "header"}}
+<header class="site-header">
+  <a class="brand" href="{{.URL "/"}}">
+    <img class="brand-mark" src="/static/logo.svg?v={{.AssetV}}" alt="" aria-hidden="true">
+    <span class="brand-name">{{.T "brand.name"}}</span>
+  </a>
+</header>
+{{end}}
+
+{{define "footer"}}
+<footer class="site-footer">
+  <nav class="footer-nav">
+    <a href="{{.URL "/about"}}">{{.T "nav.about"}}</a>
+    {{if .HasGuide}}<a href="{{.URL "/guide"}}">{{.T "nav.guide"}}</a>{{end}}
+    {{if .HasFAQ}}<a href="{{.URL "/faq"}}">{{.T "nav.faq"}}</a>{{end}}
+    <a href="{{.URL "/privacy"}}">{{.T "nav.privacy"}}</a>
+    <a href="{{.URL "/terms"}}">{{.T "nav.terms"}}</a>
+    <a href="{{.URL "/abuse"}}">{{.T "nav.abuse"}}</a>
+    <a href="https://github.com/paps-jp/securefile" rel="noreferrer" target="_blank">{{.T "nav.source"}}</a>
+  </nav>
+  <nav class="lang-switcher" aria-label="Language">
+    {{range .LangLinks}}{{if .Current}}<span class="lang-current" aria-current="true">{{.Name}}</span>{{else}}<a href="{{.Rel}}" hreflang="{{.Code}}" lang="{{.Code}}">{{.Name}}</a>{{end}}{{end}}
+  </nav>
+  <p class="footer-org">{{.T "footer.operator"}}<a href="https://paps.jp" rel="noreferrer">{{.T "footer.org"}}</a></p>
+</footer>
+</body>
+</html>
+{{end}}
+
+{{define "donate"}}
+<section class="donate">
+  <h2>{{.T "donate.title"}}</h2>
+  <p>{{.T "donate.p1"}}</p>
+  <p>{{.T "donate.p2"}}</p>
+  <p>{{.T "donate.p3"}}</p>
+  <p><a class="btn-primary btn-donate" href="https://www.paps.jp/supporter" rel="noreferrer" target="_blank">{{.T "donate.cta"}}</a></p>
+  <p class="field-hint">{{.T "donate.note"}}</p>
+</section>
+{{end}}
+
+{{define "ads"}}
+{{if .AdsenseClient}}
+<div class="ad-slot" aria-label="広告">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{.AdsenseClient}}" crossorigin="anonymous"></script>
+  <ins class="adsbygoogle" style="display:block"
+       data-ad-client="{{.AdsenseClient}}"
+       data-ad-slot="1320836240"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script src="/static/ads.js?v={{.AssetV}}" defer></script>
+</div>
+{{end}}
+{{end}}

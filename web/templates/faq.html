@@ -1,0 +1,25 @@
+{{template "head" .}}
+{{template "header" .}}
+<main class="page page-narrow prose">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{{.URL "/"}}">{{.T "brand.name"}}</a>
+    <span aria-hidden="true">›</span>
+    <span>{{.T "faq.h1"}}</span>
+  </nav>
+
+  <h1 class="page-title">{{.T "faq.h1"}}</h1>
+  <p class="page-lead">{{.T "faq.lead"}}</p>
+
+  <div class="faq-list">
+    {{range .FAQ}}
+    <details class="faq-item">
+      <summary>{{.Q}}</summary>
+      <div class="faq-answer"><p>{{.A}}</p></div>
+    </details>
+    {{end}}
+  </div>
+
+  <p class="content-cta"><a class="btn-primary" href="{{.URL "/"}}">{{.T "faq.cta"}}</a></p>
+</main>
+{{template "ads" .}}
+{{template "footer" .}}

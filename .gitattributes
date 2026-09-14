@@ -1,0 +1,9 @@
+# Normalize line endings; treat web assets and Go as text so diffs are readable.
+* text=auto eol=lf
+*.go text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
+*.sql text eol=lf
+*.zip binary

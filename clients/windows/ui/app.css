@@ -1,0 +1,627 @@
+/* セキュファイル便 — one stylesheet, no external fonts or frameworks.
+   The content security policy blocks anything from another origin, so the
+   type stack is deliberately all system fonts. */
+
+:root {
+  color-scheme: light dark;
+
+  --accent: #00807f;
+  --accent-strong: #006463;
+  --accent-soft: #e3f2f1;
+
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --border: #dcdfe3;
+  --border-strong: #b9bfc6;
+
+  --text: #1d2327;
+  --text-muted: #5c666f;
+
+  --danger: #b3261e;
+  --danger-soft: #fdecea;
+  --warn-soft: #fff6e0;
+  --warn-border: #e6b800;
+
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 2px rgba(15, 25, 35, .06), 0 4px 14px rgba(15, 25, 35, .06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #3fb8b6;
+    --accent-strong: #61cfcd;
+    --accent-soft: #123433;
+
+    --bg: #14181b;
+    --surface: #1c2125;
+    --border: #303840;
+    --border-strong: #47525c;
+
+    --text: #e7ebee;
+    --text-muted: #9aa5ae;
+
+    --danger: #ef8b84;
+    --danger-soft: #3a1f1d;
+    --warn-soft: #332b12;
+    --warn-border: #8a7118;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .3);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo,
+               system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+}
+
+a { color: var(--accent-strong); }
+a:hover { color: var(--accent); }
+
+/* --- header / footer ---------------------------------------------------- */
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: .9rem 1.25rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.brand-mark { width: 1.75rem; height: 1.75rem; flex: none; }
+
+.brand-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text);
+}
+
+.site-footer {
+  max-width: 44rem;
+  margin: 3rem auto 0;
+  padding: 1.5rem 1.25rem 2.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem 1.1rem;
+  margin-bottom: .6rem;
+}
+
+.footer-org { margin: 0; }
+
+/* --- page --------------------------------------------------------------- */
+
+.page {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 0;
+}
+
+.page-narrow { max-width: 36rem; }
+
+.page-title {
+  margin: 0 0 .6rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.page-lead {
+  margin: 0 0 1.75rem;
+  color: var(--text-muted);
+}
+
+.prose h2 {
+  margin: 2rem 0 .5rem;
+  font-size: 1.1rem;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose ul { padding-left: 1.3rem; }
+.prose li { margin-bottom: .3rem; }
+
+/* --- drop zone ---------------------------------------------------------- */
+
+.dropzone {
+  display: block;
+  width: 100%;
+  padding: 2.25rem 1.25rem;
+  background: var(--surface);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+
+.dropzone:hover,
+.dropzone:focus-visible,
+.dropzone.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  outline: none;
+}
+
+.dropzone-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--accent);
+}
+
+.dropzone-title {
+  margin: .5rem 0 .2rem;
+  font-weight: 600;
+}
+
+.dropzone-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+/* A full-window overlay while a drag is in flight, so the target is the whole
+   page rather than a small rectangle the user has to aim at. */
+.drag-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 128, 127, .12);
+  backdrop-filter: blur(2px);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  pointer-events: none;
+}
+
+/* --- file list ---------------------------------------------------------- */
+
+.file-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem .85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: .5rem;
+}
+
+.file-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: .95rem;
+}
+
+.file-size {
+  flex: none;
+  color: var(--text-muted);
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.file-state {
+  flex: none;
+  font-size: .8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.file-state.is-done { color: var(--accent); }
+.file-state.is-error { color: var(--danger); }
+
+.file-remove,
+.file-download {
+  flex: none;
+  padding: .3rem .7rem;
+  font-size: .8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.file-download {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.file-remove:hover { border-color: var(--danger); color: var(--danger); }
+.file-download:hover { background: var(--accent-soft); }
+
+.total-line {
+  margin: .25rem 0 0;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+/* --- form controls ------------------------------------------------------ */
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 34rem) {
+  .options { grid-template-columns: 1fr 1fr; }
+}
+
+.field { margin-bottom: 1.25rem; }
+
+.field label {
+  display: block;
+  margin-bottom: .3rem;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.field-hint {
+  margin: .35rem 0 0;
+  color: var(--text-muted);
+  font-size: .8rem;
+  line-height: 1.6;
+}
+
+select,
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: .6rem .7rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+select:focus-visible,
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.password-row,
+.copy-row {
+  display: flex;
+  gap: .5rem;
+}
+
+.password-row input,
+.copy-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .04em;
+}
+
+/* --- buttons ------------------------------------------------------------ */
+
+.btn-primary {
+  display: inline-block;
+  width: 100%;
+  padding: .8rem 1.25rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn-primary:hover { background: var(--accent-strong); color: #fff; }
+
+.btn-primary:disabled {
+  background: var(--border-strong);
+  cursor: not-allowed;
+}
+
+.btn-ghost,
+.btn-copy {
+  flex: none;
+  padding: .6rem 1rem;
+  font: inherit;
+  font-size: .9rem;
+  color: var(--accent-strong);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btn-ghost:hover,
+.btn-copy:hover { background: var(--accent-soft); }
+
+.btn-copy.is-copied {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* --- panels ------------------------------------------------------------- */
+
+.panel {
+  margin-top: 1.5rem;
+  padding: 1.35rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.panel-title {
+  margin: 0 0 .9rem;
+  font-size: 1.1rem;
+}
+
+.panel-result { border-color: var(--accent); }
+
+.result-field { margin-bottom: 1rem; }
+
+.result-field label {
+  display: block;
+  margin-bottom: .3rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.result-meta {
+  margin: .5rem 0 0;
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+.download-actions { margin-top: 1.25rem; }
+
+/* --- progress ----------------------------------------------------------- */
+
+.progress-bar {
+  height: .6rem;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width .2s ease-out;
+}
+
+.progress-text {
+  margin: .7rem 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-detail {
+  margin: .2rem 0 1rem;
+  color: var(--text-muted);
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- notices ------------------------------------------------------------ */
+
+.notice {
+  margin: 1rem 0 0;
+  padding: .8rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: .875rem;
+  line-height: 1.65;
+}
+
+.notice-warn {
+  background: var(--warn-soft);
+  border-color: var(--warn-border);
+}
+
+.notice-error {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* --- status strip ------------------------------------------------------- */
+
+.status-strip {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: .85rem;
+}
+
+.status-title {
+  margin: 0 0 .4rem;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.status-strip p { margin: .2rem 0; }
+.status-note { font-size: .8rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* --- password embed checkbox + copyable message ------------------------- */
+
+/* Selector is specific enough to beat the generic ".field label" rule, which
+   would otherwise force these label-wrapped checkbox rows to display:block. */
+.field .check-line,
+.check-line {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin: .6rem 0 0;
+  padding: .8rem .9rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: .9rem;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+
+.check-line:hover,
+.check-line:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.field .check-line input[type="checkbox"],
+.check-line input[type="checkbox"] {
+  flex: none;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+textarea#share-message {
+  display: block;
+  width: 100%;
+  min-height: 8rem;
+  padding: .7rem .8rem;
+  font: inherit;
+  font-size: .9rem;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  resize: vertical;
+  margin-bottom: .5rem;
+  box-sizing: border-box;
+}
+
+.btn-copy-block {
+  display: block;
+  width: 100%;
+}
+
+/* --- recipient delete ---------------------------------------------------- */
+
+.delete-box {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger-soft);
+}
+
+/* --- disk usage bar + ad slot ------------------------------------------- */
+
+.usage-bar {
+  height: .6rem;
+  background: var(--border-strong);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: .3rem 0 .7rem;
+}
+
+.usage-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width .3s;
+}
+
+.ad-slot {
+  margin: 2rem 0 0;
+  min-height: 90px;
+  text-align: center;
+}
+
+/* --- share QR ----------------------------------------------------------- */
+
+.share-qr {
+  width: 180px;
+  max-width: 60%;
+  margin: .25rem 0;
+  background: #fff;
+  padding: .5rem;
+  border-radius: var(--radius);
+}
+.share-qr svg { display: block; width: 100%; height: auto; }
+
+/* --- upload limit callout ------------------------------------------------ */
+
+.limit-callout {
+  margin: 1.25rem 0 1.5rem;
+  padding: .8rem 1rem;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.limit-callout strong {
+  color: var(--accent-strong);
+  font-size: 1.1rem;
+}
+
+.limit-callout-note {
+  display: block;
+  margin-top: .25rem;
+  font-size: .8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}

@@ -1,0 +1,204 @@
+{{template "head" .}}
+{{template "header" .}}
+
+<main class="page">
+  <h1 class="page-title">{{.T "index.page_title"}}</h1>
+  <p class="page-lead">{{.Th "index.lead"}}</p>
+
+  <!-- A file share and a secret message travel through the same encrypted
+       pipeline; the toggle only changes what the sender is asked to provide. -->
+  <div class="mode-switch" role="tablist" aria-label="{{.T "index.mode_aria"}}">
+    <button type="button" class="mode-tab is-active" id="mode-file" role="tab" aria-selected="true">{{.T "index.mode_file"}}</button>
+    <button type="button" class="mode-tab" id="mode-text" role="tab" aria-selected="false">{{.T "index.mode_text"}}</button>
+  </div>
+
+  <form id="upload-form" novalidate>
+    <!-- The drop zone is also a button and a file input label, so the same
+         target works for drag-and-drop, click, and keyboard. -->
+    <div id="dropzone" class="dropzone" tabindex="0" role="button"
+         aria-describedby="dropzone-hint">
+      <svg class="dropzone-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <path d="M24 32V12m0 0-7 7m7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8 30v4a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <p class="dropzone-title">{{.T "index.dropzone_title"}}</p>
+      <p id="dropzone-hint" class="dropzone-hint">{{.Tf "index.dropzone_hint" .Limits.MaxFiles .Limits.MaxTotalHuman}}</p>
+      <p class="dropzone-sub">{{.T "index.dropzone_sub"}}</p>
+      <input type="file" id="file-input" multiple hidden>
+    </div>
+
+    <!-- Secret-message mode: the text becomes a single encrypted item the
+         recipient reads inline rather than downloads. -->
+    <div id="message-block" hidden>
+      <label class="visually-hidden" for="message-input">{{.T "index.message_input_label"}}</label>
+      <textarea id="message-input" rows="8" placeholder="{{.T "index.message_placeholder"}}"></textarea>
+      <p class="field-hint">{{.T "index.message_hint"}}</p>
+    </div>
+
+    <ul id="file-list" class="file-list" aria-live="polite"></ul>
+    <p id="total-line" class="total-line" hidden></p>
+
+    <!-- Everything below is optional; sensible defaults (7 days, 5 downloads, an
+         auto-generated password) apply when it stays collapsed, keeping the
+         default flow to just "drop and send". -->
+    <details class="advanced">
+      <summary>{{.T "index.advanced"}}</summary>
+      <div class="advanced-body">
+        <div class="options">
+          <div class="field">
+            <label for="days">{{.T "index.days_label"}}</label>
+            <select id="days" name="days">
+              <option value="1">{{$.Tf "unit.days" 1}}</option>
+              <option value="3">{{$.Tf "unit.days" 3}}</option>
+              <option value="7" selected>{{$.Tf "unit.days" 7}}</option>
+              <option value="14">{{$.Tf "unit.days" 14}}</option>
+              <option value="30">{{$.Tf "unit.days" 30}}</option>
+              <option value="60">{{$.Tf "unit.days" 60}}</option>
+              <option value="100">{{$.Tf "unit.days" 100}}</option>
+            </select>
+            <p class="field-hint">{{.T "index.days_hint"}}</p>
+          </div>
+
+          <div class="field">
+            <label for="max-downloads">{{.T "index.downloads_label"}}</label>
+            <select id="max-downloads" name="maxDownloads">
+              <option value="1">{{$.Tf "unit.downloads" 1}}</option>
+              <option value="3">{{$.Tf "unit.downloads" 3}}</option>
+              <option value="5" selected>{{$.Tf "unit.downloads" 5}}</option>
+              <option value="10">{{$.Tf "unit.downloads" 10}}</option>
+              <option value="20">{{$.Tf "unit.downloads" 20}}</option>
+              <option value="100">{{$.Tf "unit.downloads" 100}}</option>
+            </select>
+            <p class="field-hint">{{.T "index.downloads_hint"}}</p>
+          </div>
+        </div>
+
+        <div class="limit-callout" aria-live="polite">
+          {{.T "index.limit_callout_label"}}<strong id="limit-callout-value">{{.Limits.MaxTotalHuman}}</strong>
+          <span class="limit-callout-note">{{.T "index.limit_callout_note"}}</span>
+        </div>
+
+        <div class="field field-password">
+          <label for="password">{{.T "index.password_label"}}</label>
+          <div class="password-row">
+            <input type="text" id="password" name="password" autocomplete="off"
+                   spellcheck="false" placeholder="{{.T "index.password_placeholder"}}">
+            <button type="button" id="regen" class="btn-ghost" title="{{.T "index.regen"}}">{{.T "index.regen"}}</button>
+          </div>
+          <label class="check-line">
+            <input type="checkbox" id="embed-password">
+            {{.T "index.embed_label"}}
+          </label>
+          <p class="field-hint" id="password-hint">{{.Th "index.password_hint_default"}}</p>
+        </div>
+
+        <div class="field">
+          <label class="check-line">
+            <input type="checkbox" id="allow-delete">
+            {{.T "index.allow_delete_label"}}
+          </label>
+          <p class="field-hint">{{.T "index.allow_delete_hint"}}</p>
+        </div>
+
+        <div class="field">
+          <label class="check-line">
+            <input type="checkbox" id="make-manage">
+            {{.T "index.manage_label"}}
+          </label>
+          <p class="field-hint">{{.T "index.manage_hint"}}</p>
+        </div>
+      </div>
+    </details>
+
+    <button type="submit" id="submit" class="btn-primary">{{.T "index.submit"}}</button>
+  </form>
+
+  <!-- Progress replaces the form once a transfer starts. -->
+  <section id="progress-panel" class="panel" hidden aria-live="polite">
+    <h2 class="panel-title">{{.T "index.uploading"}}</h2>
+    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+    <p id="progress-text" class="progress-text">{{.T "js.preparing"}}</p>
+    <p id="progress-detail" class="progress-detail"></p>
+    <button type="button" id="cancel" class="btn-ghost">{{.T "index.cancel"}}</button>
+  </section>
+
+  <section id="result-panel" class="panel panel-result" hidden>
+    <h2 class="panel-title">{{.T "index.result_title"}}</h2>
+
+    <div class="result-field">
+      <label for="share-url">{{.T "index.share_url_label"}}</label>
+      <div class="copy-row">
+        <input type="text" id="share-url" readonly>
+        <button type="button" class="btn-copy" data-copy="share-url">{{.T "common.copy"}}</button>
+      </div>
+    </div>
+
+    <div class="result-field" id="password-field">
+      <label for="share-password">{{.T "index.password_label"}}</label>
+      <div class="copy-row">
+        <input type="text" id="share-password" readonly>
+        <button type="button" class="btn-copy" data-copy="share-password">{{.T "common.copy"}}</button>
+      </div>
+    </div>
+
+    <div class="result-field">
+      <label>{{.T "index.qr_label"}}</label>
+      <div id="share-qr" class="share-qr" aria-label="{{.T "index.qr_aria"}}"></div>
+    </div>
+
+    <div class="result-field">
+      <label for="share-message">{{.T "index.message_label"}}</label>
+      <textarea id="share-message" rows="6" readonly></textarea>
+      <button type="button" class="btn-copy btn-copy-block" data-copy="share-message">{{.T "index.copy_message"}}</button>
+      <div class="share-actions">
+        <button type="button" id="native-share" class="btn-ghost" hidden>{{.T "index.share_native"}}</button>
+        <a id="mail-share" class="btn-ghost" href="#">{{.T "index.share_mail"}}</a>
+      </div>
+    </div>
+
+    <p class="notice notice-warn" id="password-warn">{{.T "index.password_warn"}}</p>
+
+    <div class="result-field" id="manage-field" hidden>
+      <label for="manage-link">{{.T "index.manage_link_label"}}</label>
+      <div class="copy-row">
+        <input type="text" id="manage-link" readonly>
+        <button type="button" class="btn-copy" data-copy="manage-link">{{.T "common.copy"}}</button>
+      </div>
+      <p class="field-hint">{{.T "index.manage_link_hint"}}</p>
+    </div>
+
+    <p id="expiry-line" class="result-meta"></p>
+
+    <button type="button" id="another" class="btn-ghost">{{.T "index.another"}}</button>
+  </section>
+
+  <p id="error-line" class="notice notice-error" hidden role="alert"></p>
+
+  {{template "ads" .}}
+
+  <section class="status-strip">
+    <h2 class="status-title">{{.T "status.title"}}</h2>
+    <p>
+      {{.T "status.stored_label"}}
+      <strong id="stat-files">{{.Stats.Files}}</strong>{{.T "status.files_unit"}}{{.T "status.paren_open"}}<strong id="stat-bytes">{{.Stats.BytesHuman}}</strong>{{.T "status.paren_close"}}
+    </p>
+    {{if .Stats.QuotaHuman}}
+    <p>
+      {{.T "status.disk_label"}}<strong id="stat-usage">{{.Stats.BytesHuman}}</strong> /
+      {{.Stats.QuotaHuman}}{{.T "status.paren_open"}}<span id="stat-percent">{{.Stats.Percent}}</span>%{{.T "status.paren_close"}}
+    </p>
+    <div class="usage-bar">
+      <div class="usage-fill" id="usage-fill" style="width:{{.Stats.Percent}}%"></div>
+    </div>
+    <p id="usage-warn" class="notice notice-warn"{{if lt .Stats.Percent 95}} hidden{{end}}>{{.T "status.near_full"}}</p>
+    {{end}}
+    <p class="status-note">
+      {{.T "status.note_limit_label"}}<strong id="current-limit">{{.Limits.MaxTotalHuman}}</strong>{{.T "status.note_rest"}}
+    </p>
+  </section>
+</main>
+
+<script src="/static/qrcode.js?v={{.AssetV}}" defer></script>
+<script src="{{.URL "/i18n.js"}}?v={{.AssetV}}" defer></script>
+<script src="/static/upload.js?v={{.AssetV}}" defer></script>
+{{template "footer" .}}

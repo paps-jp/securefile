@@ -1,0 +1,30 @@
+{{template "head" .}}
+{{template "header" .}}
+<main class="page page-narrow prose">
+{{.Th "about.body"}}
+
+<h2>{{.T "about.oss_title"}}</h2>
+{{.Th "about.oss_body"}}
+
+{{template "donate" .}}
+
+<section class="status-strip">
+  <h2 class="status-title">{{.T "status.title"}}</h2>
+  <p>
+    {{.T "status.stored_label"}}
+    <strong>{{.Stats.Files}}</strong>{{.T "status.files_unit"}}{{.T "status.paren_open"}}<strong>{{.Stats.BytesHuman}}</strong>{{.T "status.paren_close"}}
+  </p>
+  {{if .Stats.QuotaHuman}}
+  <p>
+    {{.T "status.disk_label"}}<strong>{{.Stats.BytesHuman}}</strong> /
+    {{.Stats.QuotaHuman}}{{.T "status.paren_open"}}{{.Stats.Percent}}%{{.T "status.paren_close"}}
+  </p>
+  <div class="usage-bar">
+    <div class="usage-fill" style="width:{{.Stats.Percent}}%"></div>
+  </div>
+  {{if ge .Stats.Percent 95}}<p class="notice notice-warn">{{.T "status.near_full"}}</p>{{end}}
+  {{end}}
+</section>
+</main>
+  {{template "ads" .}}
+{{template "footer" .}}

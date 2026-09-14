@@ -1,0 +1,16 @@
+/securefile
+/securefile.exe
+/dist/
+/data/
+
+# Windows client build artifacts
+/clients/windows/securefile_send.exe
+/clients/windows/*.obj
+/clients/windows/*.res
+/clients/windows/*.pdb
+/clients/windows/icon.png
+
+*.db
+*.db-wal
+*.db-shm
+.env

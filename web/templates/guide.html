@@ -1,0 +1,29 @@
+{{template "head" .}}
+{{template "header" .}}
+<main class="page page-narrow prose">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{{.URL "/"}}">{{.T "brand.name"}}</a>
+    <span aria-hidden="true">›</span>
+    <span>{{.T "guide.h1"}}</span>
+  </nav>
+
+  <h1 class="page-title">{{.T "guide.h1"}}</h1>
+  <p class="page-lead">{{.T "guide.lead"}}</p>
+
+  <ol class="how-steps">
+    {{range .Steps}}
+    <li>
+      <h2 class="how-step-name">{{.Name}}</h2>
+      <p>{{.Text}}</p>
+    </li>
+    {{end}}
+  </ol>
+
+  <!-- Use-case sections target the specific queries (large files, PPAP
+       replacement, phone, photos) that the tool page cannot rank for. -->
+  {{.Th "guide.body"}}
+
+  <p class="content-cta"><a class="btn-primary" href="{{.URL "/"}}">{{.T "guide.cta"}}</a></p>
+</main>
+{{template "ads" .}}
+{{template "footer" .}}

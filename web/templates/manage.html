@@ -1,0 +1,54 @@
+{{template "head" .}}
+{{template "header" .}}
+
+<main class="page page-narrow" id="manage-main">
+  <h1 class="page-title">{{.T "manage.page_title"}}</h1>
+  <p class="page-lead">{{.T "manage.lead"}}</p>
+
+  <section id="manage-checking" class="panel">
+    <p class="progress-text">{{.T "manage.checking"}}</p>
+  </section>
+
+  <!-- No token in the fragment, or an unknown/removed share: both look the same. -->
+  <section id="manage-missing" class="panel" hidden>
+    <h2 class="panel-title">{{.T "manage.missing_title"}}</h2>
+    <p>{{.T "manage.missing_body"}}</p>
+    <a class="btn-primary" href="{{.URL "/"}}">{{.T "download.send_own"}}</a>
+  </section>
+
+  <section id="manage-status" class="panel" hidden>
+    <h2 class="panel-title">{{.T "manage.status_title"}}</h2>
+    <span id="manage-state" class="manage-state"></span>
+    <dl class="manage-grid">
+      <dt>{{.T "manage.downloads"}}</dt><dd id="manage-downloads">—</dd>
+      <dt>{{.T "manage.expiry"}}</dt><dd id="manage-expiry">—</dd>
+      <dt>{{.T "manage.created"}}</dt><dd id="manage-created">—</dd>
+      <dt>{{.T "manage.size"}}</dt><dd id="manage-size">—</dd>
+    </dl>
+
+    <div class="result-field">
+      <label for="manage-url">{{.T "manage.share_url_label"}}</label>
+      <div class="copy-row">
+        <input type="text" id="manage-url" readonly>
+        <button type="button" class="btn-copy" data-copy="manage-url">{{.T "common.copy"}}</button>
+      </div>
+    </div>
+
+    <div class="delete-box">
+      <button type="button" id="manage-delete" class="btn-ghost btn-danger">{{.T "manage.delete"}}</button>
+      <p class="field-hint">{{.T "manage.delete_hint"}}</p>
+    </div>
+  </section>
+
+  <section id="manage-deleted" class="panel" hidden>
+    <h2 class="panel-title">{{.T "manage.deleted_title"}}</h2>
+    <p>{{.T "manage.deleted_body"}}</p>
+    <a class="btn-primary" href="{{.URL "/"}}">{{.T "download.send_own"}}</a>
+  </section>
+
+  <p id="manage-error" class="notice notice-error" hidden role="alert"></p>
+</main>
+
+<script src="{{.URL "/i18n.js"}}?v={{.AssetV}}" defer></script>
+<script src="/static/manage.js?v={{.AssetV}}" defer></script>
+{{template "footer" .}}

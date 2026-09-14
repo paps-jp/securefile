@@ -1,0 +1,54 @@
+[Unit]
+Description=セキュファイル便 (securefile)
+Documentation=https://up.paps.jp/about
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=securefile
+Group=securefile
+ExecStart=/usr/local/bin/securefile
+EnvironmentFile=/etc/securefile/securefile.env
+Restart=on-failure
+RestartSec=3s
+
+# The service writes exactly two things: the metadata database and the blob
+# directory, both under StateDirectory. Everything else on the host is
+# read-only or invisible to it, so a flaw in file handling cannot reach past
+# the data it is meant to touch.
+StateDirectory=securefile
+StateDirectoryMode=0700
+WorkingDirectory=/var/lib/securefile
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+CapabilityBoundingSet=
+AmbientCapabilities=
+UMask=0077
+
+# Uploads are held open while bytes stream; the default of 1024 is thin for a
+# service whose whole job is long-lived transfers.
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

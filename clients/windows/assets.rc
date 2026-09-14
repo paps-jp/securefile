@@ -1,0 +1,13 @@
+#include "resource.h"
+
+// The application icon (shown by Explorer and used for the tray icon).
+IDI_APPICON ICON "icon.ico"
+
+// The browser-facing page and its assets are baked into the .exe as RCDATA, so
+// the client stays a single self-contained file with nothing to install
+// alongside it. Paths are relative to this .rc file.
+IDR_SEND_HTML RCDATA "ui\\send.html"
+IDR_APP_CSS   RCDATA "ui\\app.css"
+IDR_SEND_JS   RCDATA "ui\\send.js"
+IDR_QRCODE_JS RCDATA "ui\\qrcode.js"
+IDR_LOGO_SVG  RCDATA "ui\\logo.svg"

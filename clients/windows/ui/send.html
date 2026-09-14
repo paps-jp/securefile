@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ファイルを送る｜セキュファイル便</title>
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="/app.css">
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="site-header">
+  <span class="brand">
+    <img class="brand-mark" src="/logo.svg" alt="" aria-hidden="true">
+    <span class="brand-name">セキュファイル便</span>
+  </span>
+</header>
+
+<main class="page">
+  <h1 class="page-title">ファイルを送る</h1>
+  <p class="page-lead">
+    右クリックから選んだファイルです。内容を確認し、設定を選んで送信してください。
+    ファイルは<strong>パスワードで鍵をかけて</strong>保管され、サーバー管理者もパスワードなしでは中身を読めません。
+  </p>
+
+  <form id="send-form" novalidate>
+    <ul id="file-list" class="file-list" aria-live="polite"></ul>
+    <p id="total-line" class="total-line" hidden></p>
+
+    <div class="options">
+      <div class="field">
+        <label for="days">保存期間</label>
+        <select id="days" name="days">
+          <option value="1">1日</option>
+          <option value="3">3日</option>
+          <option value="7" selected>7日</option>
+          <option value="14">14日</option>
+          <option value="30">30日</option>
+          <option value="60">60日</option>
+          <option value="100">100日</option>
+        </select>
+        <p class="field-hint">期限が来るとファイルは自動的に削除されます。</p>
+      </div>
+
+      <div class="field">
+        <label for="max-downloads">ダウンロード回数</label>
+        <select id="max-downloads" name="maxDownloads">
+          <option value="1">1回</option>
+          <option value="3">3回</option>
+          <option value="5" selected>5回</option>
+          <option value="10">10回</option>
+          <option value="20">20回</option>
+          <option value="100">100回</option>
+        </select>
+        <p class="field-hint">1回の受け取りで、含まれるファイルは全部ダウンロードできます。</p>
+      </div>
+    </div>
+
+    <div class="limit-callout" aria-live="polite">
+      この設定でのアップロード上限：<strong id="limit-callout-value">—</strong>
+      <span class="limit-callout-note">保存期間・ダウンロード回数を大きくすると上限は小さくなります。</span>
+    </div>
+
+    <div class="field field-password">
+      <label for="password">パスワード</label>
+      <div class="password-row">
+        <input type="text" id="password" name="password" autocomplete="off"
+               spellcheck="false" placeholder="自動生成されます">
+        <button type="button" id="regen" class="btn-ghost" title="再生成">再生成</button>
+      </div>
+      <label class="check-line">
+        <input type="checkbox" id="embed-password">
+        リンクにパスワードを含める（受け取る人はリンクだけで開けます）
+      </label>
+      <p class="field-hint" id="password-hint">
+        自動生成のままで十分安全です。受け取る人には
+        <strong>リンクとは別の手段</strong>（電話・対面など）で伝えてください。
+      </p>
+    </div>
+
+    <div class="field">
+      <label class="check-line">
+        <input type="checkbox" id="allow-delete">
+        受け取った人がダウンロード後にファイルを削除できるようにする
+      </label>
+      <p class="field-hint">
+        受け取った相手が、用が済んだファイルをその場でサーバーから削除できます。
+      </p>
+    </div>
+
+    <button type="submit" id="submit" class="btn-primary" disabled>アップロード</button>
+  </form>
+
+  <section id="progress-panel" class="panel" hidden aria-live="polite">
+    <h2 class="panel-title">アップロード中</h2>
+    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+    <p id="progress-text" class="progress-text">準備しています…</p>
+    <p id="progress-detail" class="progress-detail"></p>
+  </section>
+
+  <section id="result-panel" class="panel panel-result" hidden>
+    <h2 class="panel-title">アップロードが完了しました</h2>
+
+    <div class="result-field">
+      <label for="share-url">受け取り用リンク</label>
+      <div class="copy-row">
+        <input type="text" id="share-url" readonly>
+        <button type="button" class="btn-copy" data-copy="share-url">コピー</button>
+      </div>
+    </div>
+
+    <div class="result-field" id="password-field">
+      <label for="share-password">パスワード</label>
+      <div class="copy-row">
+        <input type="text" id="share-password" readonly>
+        <button type="button" class="btn-copy" data-copy="share-password">コピー</button>
+      </div>
+    </div>
+
+    <div class="result-field">
+      <label>QRコード（スマホで読み取り）</label>
+      <div id="share-qr" class="share-qr" aria-label="受け取りリンクのQRコード"></div>
+    </div>
+
+    <div class="result-field">
+      <label for="share-message">貼り付け用のメッセージ</label>
+      <textarea id="share-message" rows="6" readonly></textarea>
+      <button type="button" class="btn-copy btn-copy-block" data-copy="share-message">メッセージをコピー</button>
+    </div>
+
+    <p class="notice notice-warn" id="password-warn">
+      パスワードはここにしか表示されません。ページを閉じる前に控えてください。
+      サーバーには保存されていないため、失われたファイルは誰にも復元できません。
+    </p>
+    <p id="expiry-line" class="result-meta"></p>
+
+    <p class="result-meta">この画面は閉じて構いません。</p>
+  </section>
+
+  <p id="error-line" class="notice notice-error" hidden role="alert"></p>
+</main>
+
+<script src="/qrcode.js" defer></script>
+<script src="/send.js" defer></script>
+</body>
+</html>

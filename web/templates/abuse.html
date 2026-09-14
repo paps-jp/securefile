@@ -1,0 +1,44 @@
+{{template "head" .}}
+{{template "header" .}}
+<main class="page page-narrow prose">
+  <h1 class="page-title">{{.T "abuse.page_title"}}</h1>
+
+  {{if .Reported}}
+  <p class="notice notice-warn">{{.Th "abuse.reported_notice"}}</p>
+  {{end}}
+  {{if .ReportError}}
+  <p class="notice notice-error">{{.ReportError}}</p>
+  {{end}}
+
+  <p>{{.Th "abuse.intro"}}</p>
+
+  <form method="post" action="{{.URL "/abuse/report"}}" class="report-form">
+    <div class="field">
+      <label for="report-url">{{.T "abuse.url_label"}}<span class="req">{{.T "abuse.required"}}</span></label>
+      <input type="text" id="report-url" name="url" required
+             placeholder="{{.T "abuse.url_placeholder"}}" autocomplete="off" spellcheck="false">
+      <p class="field-hint">{{.T "abuse.url_hint"}}</p>
+    </div>
+
+    <div class="field">
+      <label for="report-reason">{{.T "abuse.reason_label"}}</label>
+      <textarea id="report-reason" name="reason" rows="4"
+                placeholder="{{.T "abuse.reason_placeholder"}}"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="report-contact">{{.T "abuse.contact_label"}}</label>
+      <input type="text" id="report-contact" name="contact" autocomplete="off"
+             placeholder="{{.T "abuse.contact_placeholder"}}">
+    </div>
+
+    <button type="submit" class="btn-primary">{{.T "abuse.submit"}}</button>
+  </form>
+
+  <p class="notice">{{.T "abuse.encryption_note"}}</p>
+
+  <h2>{{.T "abuse.consult_title"}}</h2>
+  <p>{{.Th "abuse.consult_body"}}</p>
+</main>
+  {{template "ads" .}}
+{{template "footer" .}}

@@ -1,0 +1,103 @@
+{{template "head" .}}
+{{template "header" .}}
+
+<main class="page page-narrow" data-key="{{.Key}}">
+  <h1 class="page-title">{{.T "download.page_title"}}</h1>
+
+  <!-- Everything below is filled in by script once the key is checked. The
+       page renders identically for a key that does not exist, so probing for
+       valid links learns nothing from the HTML alone. -->
+  <section id="checking" class="panel">
+    <p class="progress-text">{{.T "download.checking"}}</p>
+  </section>
+
+  <section id="gone" class="panel" hidden>
+    <h2 class="panel-title">{{.T "download.gone_title"}}</h2>
+    <p>{{.T "download.gone_body"}}</p>
+    <a class="btn-primary" href="{{.URL "/"}}">{{.T "download.send_own"}}</a>
+  </section>
+
+  <section id="locked" class="panel" hidden>
+    <h2 class="panel-title">{{.T "download.locked_title"}}</h2>
+    <p id="locked-meta" class="result-meta"></p>
+    <form id="unlock-form">
+      <div class="field">
+        <label for="password">{{.T "download.password_label"}}</label>
+        <input type="password" id="password" autocomplete="off" spellcheck="false" required>
+      </div>
+      <button type="submit" id="unlock" class="btn-primary">{{.T "download.unlock"}}</button>
+    </form>
+    <p class="field-hint">{{.T "download.locked_hint"}}</p>
+  </section>
+
+  <section id="unlocked" class="panel" hidden>
+    <h2 class="panel-title">{{.T "download.unlocked_title"}}</h2>
+
+    <!-- Secret-message shares render inline instead of as a download. -->
+    <div id="message-view" hidden>
+      <textarea id="message-text" rows="10" readonly></textarea>
+      <button type="button" id="message-copy" class="btn-copy btn-copy-block">{{.T "download.copy_message"}}</button>
+    </div>
+
+    <ul id="download-list" class="file-list"></ul>
+    <div class="download-actions">
+      <button type="button" id="download-all" class="btn-primary">{{.T "download.download_all"}}</button>
+    </div>
+    <p id="unlocked-meta" class="result-meta"></p>
+    <div id="delete-box" class="delete-box" hidden>
+      <button type="button" id="delete-share" class="btn-ghost btn-danger">{{.T "download.delete_share"}}</button>
+      <p class="field-hint">{{.T "download.delete_hint"}}</p>
+    </div>
+  </section>
+
+  <section id="deleted" class="panel" hidden>
+    <h2 class="panel-title">{{.T "download.deleted_title"}}</h2>
+    <p>{{.T "download.deleted_body"}}</p>
+    <a class="btn-primary" href="{{.URL "/"}}">{{.T "download.send_own"}}</a>
+  </section>
+
+  <p id="error-line" class="notice notice-error" hidden role="alert"></p>
+
+  <section class="status-strip">
+    <h2 class="status-title">{{.T "status.title"}}</h2>
+    <p>
+      {{.T "status.stored_label"}}
+      <strong>{{.Stats.Files}}</strong>{{.T "status.files_unit"}}{{.T "status.paren_open"}}<strong>{{.Stats.BytesHuman}}</strong>{{.T "status.paren_close"}}
+    </p>
+    {{if .Stats.QuotaHuman}}
+    <p>
+      {{.T "status.disk_label"}}<strong>{{.Stats.BytesHuman}}</strong> /
+      {{.Stats.QuotaHuman}}{{.T "status.paren_open"}}{{.Stats.Percent}}%{{.T "status.paren_close"}}
+    </p>
+    <div class="usage-bar">
+      <div class="usage-fill" style="width:{{.Stats.Percent}}%"></div>
+    </div>
+    {{end}}
+    <p class="status-note">
+      {{.T "status.note_limit_label"}}<strong>{{.Limits.MaxTotalHuman}}</strong>{{.T "status.note_rest"}}
+    </p>
+  </section>
+
+  <p class="notice notice-warn">{{.Th "index.prohibited"}}</p>
+
+  {{if .AdsenseClient}}
+  <div class="ad-slot" aria-label="広告">
+    <ins class="adsbygoogle" style="display:block"
+         data-ad-client="{{.AdsenseClient}}"
+         data-ad-slot="1320836240"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+  </div>
+  {{end}}
+</main>
+
+<script src="{{.URL "/i18n.js"}}?v={{.AssetV}}" defer></script>
+<script src="/static/download.js?v={{.AssetV}}" defer></script>
+{{if .AdsenseClient}}
+<!-- Ads load after download.js (both deferred, so they run in order): the
+     fragment password is scrubbed before any ad script runs, and this page's
+     URL carries no share key. -->
+<script defer src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{.AdsenseClient}}" crossorigin="anonymous"></script>
+<script src="/static/ads.js?v={{.AssetV}}" defer></script>
+{{end}}
+{{template "footer" .}}
