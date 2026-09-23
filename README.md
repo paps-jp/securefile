@@ -4,6 +4,10 @@ An encrypted, registration-free file-transfer service. A single Go binary with
 an embedded SQLite database and plain-JavaScript front end: deployment is a file
 copy and a `systemctl restart`.
 
+**Live service:** [up.paps.jp](https://up.paps.jp) — "セキュファイル便", run by
+[特定非営利活動法人ぱっぷす (PAPS)](https://paps.jp) as a free, safe alternative to
+password-protected ZIP (PPAP).
+
 ## Design
 
 **The server cannot read your files.** Each share gets a random data-encryption
